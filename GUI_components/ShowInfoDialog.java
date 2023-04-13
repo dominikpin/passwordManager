@@ -14,6 +14,7 @@ import logic.Encryption;
 import logic.LoginInfo;
 
 public class ShowInfoDialog extends JDialog {
+    
     public ShowInfoDialog(LoginInfo login, char[] mainPassword) throws Exception {
         setTitle("Info display");
         setSize(400, 300);

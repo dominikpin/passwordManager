@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainFrame extends JFrame {
+    private static final int WINDOW_WIDTH = 450;
+    private static final int WINDOW_HEIGHT = 300;
     private static List<LoginInfo> loginList;
     private char[] mainPassword;
     private static String filePath;
@@ -60,10 +62,11 @@ public class MainFrame extends JFrame {
                         ex.printStackTrace();
                     }
                     dispose();
+                    System.exit(0);
                 }
             }
         });
-        setSize(450, 300);
+        setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         setLocationRelativeTo(null);
         ImageIcon icon = new ImageIcon("assets/lock-icon.jpg");
         setIconImage(icon.getImage());
@@ -74,6 +77,8 @@ public class MainFrame extends JFrame {
         JMenuItem newLoginMenuItem = new JMenuItem("New login");
         JMenuItem newPassMenuItem = new JMenuItem("Generate strong password");
 
+        // TODO unsecure passwords (same passwords)
+
         JMenuItem changeMainPassword = new JMenuItem("Change main password");
         JMenuItem logoutMenuItem = new JMenuItem("Logout");
         JMenuItem exitMenuItem = new JMenuItem("Exit");
@@ -83,7 +88,7 @@ public class MainFrame extends JFrame {
         });
         
         newPassMenuItem.addActionListener(e -> {
-            // TODO making fonction for creating strong password
+            new StrongPasswordGenDialog();
         });
         
         changeMainPassword.addActionListener(e -> {
