@@ -16,7 +16,7 @@ import logic.LoginInfo;
 
 public class AddLoginDialog extends JDialog {
     
-    public AddLoginDialog(MainFrame frame, String mainPassword) {
+    public AddLoginDialog(MainFrame frame, char[] mainPassword) {
         setTitle("Add new login");
         setSize(300, 200);
         setLocationRelativeTo(null);
@@ -36,9 +36,9 @@ public class AddLoginDialog extends JDialog {
         JButton submitButton = new JButton("Add");
         submitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (checkNewPassword(email.getText(), username.getText(), password.getText(), domain.getText())) {
+                if (checkNewPassword(email.getText(), username.getText(), password.getPassword(), domain.getText())) {
                     try {
-                        LoginInfo newLoginInfo = new LoginInfo(email.getText(), username.getText(), Encryption.encryptPassword(password.getText(), mainPassword), domain.getText(), LoginInfo.getIconAndSaveIt(domain.getText()));
+                        LoginInfo newLoginInfo = new LoginInfo(email.getText(), username.getText(), Encryption.encryptPassword(password.getPassword(), mainPassword), domain.getText(), LoginInfo.getIconAndSaveIt(domain.getText()));
                         frame.addOrRemoveLoginInfo(newLoginInfo, true);
                         JOptionPane.showMessageDialog(AddLoginDialog.this, "Successfully added a new password.", "New password added", JOptionPane.CLOSED_OPTION);
                         dispose();
@@ -65,12 +65,46 @@ public class AddLoginDialog extends JDialog {
         setVisible(true);
     }
 
-    public boolean checkNewPassword(String email, String username, String password, String domain) {
-        if ((email.isEmpty() && username.isEmpty()) || password.isEmpty()) {
+    public boolean checkNewPassword(String email, String username, char[] passwordChar, String domain) {
+        if ((email.isEmpty() && username.isEmpty()) || passwordChar.length == 0) {
             JOptionPane.showMessageDialog(AddLoginDialog.this, "One of email and username have to be filled in and password has to be filled in.", "Password couldn't be added", JOptionPane.CLOSED_OPTION);
             return false;
         }
-        // TODO add some restrictions to password made
+        if (passwordChar.length < 8) {
+            int option = JOptionPane.showConfirmDialog(
+                AddLoginDialog.this, 
+                "Your password should be at least 8 characters long. Are you sure you want to add this password?", 
+                "Password length", 
+                JOptionPane.YES_NO_OPTION);
+            if (option == JOptionPane.NO_OPTION) {
+                return false;
+            }
+        }
+        String passwordString = new String(passwordChar);
+        int counter = 0;
+        if (passwordString.matches(".*\\d.*")) {
+            counter++;
+        }
+        if (passwordString.matches(".*[a-z].*")) {
+            counter++;
+        }
+        if (passwordString.matches(".*[A-Z].*")) {
+            counter++;
+        }
+        if (passwordString.matches(".*\\p{P}.*")) {
+            counter++;
+        }
+        if (counter < 3) {
+            int option = JOptionPane.showConfirmDialog(
+                AddLoginDialog.this, 
+                "Your password should contain at least 3 out of these 4 requirements: lowercase letters, uppercase letters, numbers, and symbols. Are you sure you want to add this password?", 
+                "Password length", 
+                JOptionPane.YES_NO_OPTION);
+            if (option == JOptionPane.NO_OPTION) {
+                return false;
+            }
+        }
+        // TODO check if new password is same as any of existing ones
         return true;
     }
 

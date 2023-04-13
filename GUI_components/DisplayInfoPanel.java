@@ -15,37 +15,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.text.JTextComponent;
 
 public class DisplayInfoPanel extends JPanel {
+    private static final int BAR_WIDTH = 20;
 
-    public DisplayInfoPanel(String key, String value, boolean isPassword) {
+    public DisplayInfoPanel(String key, String value) {
         setLayout(new FlowLayout());
 
         JLabel keyLabel = new JLabel(key + ": ");
-        JTextComponent valueField;
-        if (!isPassword) {
-            valueField = new JTextField(value);
-        } else {
-            valueField = new JPasswordField(value);
-            valueField.setLayout(new BorderLayout());
-            ImageIcon eyeOpened = new ImageIcon("assets/eye-icon-opened.png");
-            ImageIcon eyeClosed = new ImageIcon("assets/eye-icon-closed.png");
-            JButton showPasswordButton = new JButton(eyeClosed);
-            showPasswordButton.addActionListener(e -> {
-                if (valueField.getText().isEmpty()) {
-                    return;
-                }
-                if (((JPasswordField) valueField).getEchoChar() == '\u2022') {
-                    ((JPasswordField) valueField).setEchoChar((char)0);
-                    showPasswordButton.setIcon(eyeOpened);
-                } else {
-                    ((JPasswordField) valueField).setEchoChar('\u2022');
-                    showPasswordButton.setIcon(eyeClosed);
-                }
-            });
-            add(showPasswordButton, BorderLayout    .EAST);
-        }
+        JTextField valueField = new JTextField(value, BAR_WIDTH);
         valueField.setEditable(false);
         JButton copyToClipboard = new JButton(new ImageIcon("assets/copy-to-clipboard-icon.png"));
         copyToClipboard.addActionListener(new ActionListener() {
@@ -58,6 +36,46 @@ public class DisplayInfoPanel extends JPanel {
             }
         });
                
+        add(keyLabel, FlowLayout.LEFT);
+        add(valueField, FlowLayout.CENTER);
+        add(copyToClipboard, FlowLayout.RIGHT);
+    }
+
+    public DisplayInfoPanel(String key, char[] value) {
+        setLayout(new FlowLayout());
+        
+        JLabel keyLabel = new JLabel(key + ": ");
+        JPasswordField valueField = new JPasswordField(new String(value), BAR_WIDTH);
+        valueField.setEditable(false);
+        valueField.setLayout(new BorderLayout());
+        ImageIcon eyeOpened = new ImageIcon("assets/eye-icon-opened.png");
+        ImageIcon eyeClosed = new ImageIcon("assets/eye-icon-closed.png");
+        JButton showPasswordButton = new JButton(eyeClosed);
+        showPasswordButton.addActionListener(e -> {
+            if (valueField.getPassword().length == 0) {
+                return;
+            }
+            if (valueField.getEchoChar() == '\u2022') {
+                valueField.setEchoChar((char)0);
+                showPasswordButton.setIcon(eyeOpened);
+            } else {
+                valueField.setEchoChar('\u2022');
+                showPasswordButton.setIcon(eyeClosed);
+            }
+        });
+        valueField.add(showPasswordButton, BorderLayout.EAST);
+
+        JButton copyToClipboard = new JButton(new ImageIcon("assets/copy-to-clipboard-icon.png"));
+        copyToClipboard.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                char[] text = valueField.getPassword();
+                StringSelection selection = new StringSelection(new String(text));
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(selection, null);
+                JOptionPane.showMessageDialog(null, key + " copied to the clipboard", "Copied to Clipboard", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        
         add(keyLabel, FlowLayout.LEFT);
         add(valueField, FlowLayout.CENTER);
         add(copyToClipboard, FlowLayout.RIGHT);

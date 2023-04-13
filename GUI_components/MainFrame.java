@@ -32,11 +32,11 @@ import java.util.List;
 
 public class MainFrame extends JFrame {
     private static List<LoginInfo> loginList;
-    private String mainPassword;
+    private char[] mainPassword;
     private static String filePath;
     private String searchBarContent = "";
 
-    public MainFrame(String filePath, String mainPassword) throws IOException{
+    public MainFrame(String filePath, char[] mainPassword) throws IOException{
         this.mainPassword = mainPassword;
         MainFrame.filePath = filePath;
         setTitle("Password manager");
