@@ -30,23 +30,22 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class Frame extends JFrame {
+public class MainFrame extends JFrame {
     private static List<LoginInfo> loginList;
     private String mainPassword;
     private static String filePath;
     private String searchBarContent = "";
 
-    public Frame(String filePath, String mainPassword) throws IOException{
+    public MainFrame(String filePath, String mainPassword) throws IOException{
         this.mainPassword = mainPassword;
-        Frame.filePath = filePath;
+        MainFrame.filePath = filePath;
         setTitle("Password manager");
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 int option = JOptionPane.showConfirmDialog(
-                        Frame.this, 
+                        MainFrame.this, 
                         "Are you sure you want to exit?", 
                         "Exit", 
                         JOptionPane.YES_NO_OPTION);
@@ -66,29 +65,79 @@ public class Frame extends JFrame {
         });
         setSize(450, 300);
         setLocationRelativeTo(null);
-        ImageIcon icon = new ImageIcon("assets/LockIcon.jpg");
+        ImageIcon icon = new ImageIcon("assets/lock-icon.jpg");
         setIconImage(icon.getImage());
         
-
-        // TODO add functionality to menubar
         JMenuBar menuBar = new JMenuBar();
 
         JMenu loginMenu = new JMenu("Login");
         JMenuItem newLoginMenuItem = new JMenuItem("New login");
         JMenuItem newPassMenuItem = new JMenuItem("Generate strong password");
 
-        JMenuItem changeMainPassword = new JMenuItem("Change Main Password");
+        JMenuItem changeMainPassword = new JMenuItem("Change main password");
         JMenuItem logoutMenuItem = new JMenuItem("Logout");
         JMenuItem exitMenuItem = new JMenuItem("Exit");
+
+        newLoginMenuItem.addActionListener(e -> {
+            new AddLoginDialog(MainFrame.this, mainPassword);
+        });
+        
+        newPassMenuItem.addActionListener(e -> {
+            // TODO making fonction for creating strong password
+        });
+        
+        changeMainPassword.addActionListener(e -> {
+            // TODO function for changing main password
+        });
+        
+        logoutMenuItem.addActionListener(e -> {
+            int option = JOptionPane.showConfirmDialog(
+                MainFrame.this, 
+                "Are you sure you want to logout?", 
+                "Logout", 
+                JOptionPane.YES_NO_OPTION);
+            if (option == JOptionPane.YES_OPTION) {
+                try {
+                    Path folderToDelete = Paths.get("Icons");
+                    Files.walk(folderToDelete)
+                            .map(Path::toFile)
+                            .sorted((o1, o2) -> -o1.compareTo(o2))
+                            .forEach(File::delete);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+                dispose();
+                new LoginFrame();
+            }
+        });
+        
+        exitMenuItem.addActionListener(e -> {
+            int option = JOptionPane.showConfirmDialog(
+                MainFrame.this, 
+                "Are you sure you want to exit?", 
+                "Exit", 
+                JOptionPane.YES_NO_OPTION);
+            if (option == JOptionPane.YES_OPTION) {
+                try {
+                    Path folderToDelete = Paths.get("Icons");
+                    Files.walk(folderToDelete)
+                            .map(Path::toFile)
+                            .sorted((o1, o2) -> -o1.compareTo(o2))
+                            .forEach(File::delete);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+                dispose();
+            }
+        });
 
         loginMenu.add(newLoginMenuItem);
         loginMenu.add(newPassMenuItem);
         loginMenu.addSeparator();
+        loginMenu.add(changeMainPassword);
         loginMenu.add(logoutMenuItem);
         loginMenu.add(exitMenuItem);
 
-
-        
         menuBar.add(loginMenu);
 
         setJMenuBar(menuBar);
@@ -98,11 +147,11 @@ public class Frame extends JFrame {
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout());
 
-        SearchBar searchBar = new SearchBar(this);
+        SearchBarField searchBar = new SearchBarField(this);
         JButton addButton = new JButton("ADD NEW LOGIN");
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                AddPassword addPassword = new AddPassword(Frame.this, mainPassword);
+                new AddLoginDialog(MainFrame.this, mainPassword);
             }
         });
 
@@ -144,7 +193,7 @@ public class Frame extends JFrame {
     public void addAllCardLogins(JPanel cardPanel) {
         for (LoginInfo login : loginList) {
             if (searchBarContent.equals("") || loginContains(searchBarContent, login)) {
-                Card card = new Card(login, this, mainPassword);
+                CardButton card = new CardButton(login, this, mainPassword);
                 JPanel cardWrapperPanel = new JPanel();
                 cardWrapperPanel.setLayout(new BoxLayout(cardWrapperPanel, BoxLayout.Y_AXIS));
                 cardWrapperPanel.add(card);

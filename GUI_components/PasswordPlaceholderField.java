@@ -1,19 +1,41 @@
 package GUI_components;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JPasswordField;
 
-public class PasswordPlaceholderField extends JPasswordField{
+public class PasswordPlaceholderField extends JPasswordField {
     private String placeholder;
-    
+
     public PasswordPlaceholderField(String placeholder) {
         super(placeholder);
         this.placeholder = placeholder;
         setEchoChar((char)0);
         setForeground(Color.GRAY);
+        setLayout(new BorderLayout());
+
+        ImageIcon eyeOpened = new ImageIcon("assets/eye-icon-opened.png");
+        ImageIcon eyeClosed = new ImageIcon("assets/eye-icon-closed.png");
+        JButton showPasswordButton = new JButton(eyeClosed);
+        showPasswordButton.addActionListener(e -> {
+            if (getText().isEmpty()) {
+                return;
+            }
+            if (getEchoChar() == '\u2022') {
+                setEchoChar((char)0);
+                showPasswordButton.setIcon(eyeOpened);
+            } else {
+                setEchoChar('\u2022');
+                showPasswordButton.setIcon(eyeClosed);
+            }
+        });
+        add(showPasswordButton, BorderLayout.EAST);
+
         addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -34,6 +56,7 @@ public class PasswordPlaceholderField extends JPasswordField{
         });
     }
 
+    // TODO replace with .getPassword()
     @Override
     public String getText() {
         String text = super.getText();
@@ -42,6 +65,4 @@ public class PasswordPlaceholderField extends JPasswordField{
         }
         return text;
     }
-
-    // TODO add button on the far right. if you press it it reveals password
 }

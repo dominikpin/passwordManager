@@ -7,7 +7,7 @@ import javax.swing.JTextField;
 
 public class PlaceholderField extends JTextField {
     private String placeholder;
-    
+
     public PlaceholderField(String placeholder) {
         super(placeholder);
         this.placeholder = placeholder;

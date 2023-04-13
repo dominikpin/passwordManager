@@ -20,15 +20,15 @@ import javax.swing.JOptionPane;
 
 import logic.Encryption;
 
-public class Register extends JDialog{
+public class RegisterDialog extends JDialog{
     
-    public Register(JFrame owner) {
+    public RegisterDialog(JFrame owner) {
         super(owner, true);
         setTitle("Register");
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         setSize(300, 150);
         setLocationRelativeTo(null);
-        ImageIcon icon = new ImageIcon("assets/LockIcon.jpg");
+        ImageIcon icon = new ImageIcon("assets/lock-icon.jpg");
         setIconImage(icon.getImage());
 
         PlaceholderField filePathOrUsername = new PlaceholderField("File path / Username");
@@ -38,11 +38,10 @@ public class Register extends JDialog{
         password.addKeyListener(createKeyListener(repeatPassword));
         repeatPassword.addKeyListener(createKeyListener(filePathOrUsername));
 
-
         JButton register = new JButton("Register");
         register.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (Register.this.checkRegistration(filePathOrUsername.getText(), password.getText(), repeatPassword.getText())) {
+                if (RegisterDialog.this.checkRegistration(filePathOrUsername.getText(), password.getText(), repeatPassword.getText())) {
                     try {
                         File file = new File("./" + filePathOrUsername.getText() + ".txt");
                         file.createNewFile();
@@ -50,7 +49,7 @@ public class Register extends JDialog{
                         writer.write(Encryption.mainPasswordEncryption(password.getText()));
                         writer.newLine();
                         writer.close();
-                        JOptionPane.showMessageDialog(Register.this, "Successfully added a new user.\nMake sure to remember your password.\nYour data will be saved in <username>.txt file so have this file in same folder as this program when you want to access your passwords", "New user added", JOptionPane.CLOSED_OPTION);
+                        JOptionPane.showMessageDialog(RegisterDialog.this, "Successfully added a new user.\nMake sure to remember your password.\nYour data will be saved in <username>.txt file so have this file in same folder as this program when you want to access your passwords", "New user added", JOptionPane.CLOSED_OPTION);
                         dispose();
                     } catch (IOException | NoSuchAlgorithmException e1) {
                         System.out.println("SOMETHING IS WRONG");

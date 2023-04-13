@@ -3,11 +3,11 @@ package GUI_components;
 import javax.swing.*;
 import java.awt.event.*;
 
-public class SearchBar extends PlaceholderField {
+public class SearchBarField extends PlaceholderField {
     private static final int SEARCH_BAR_WIDTH = 20;
-    public Frame frame;
+    public MainFrame frame;
 
-    public SearchBar(Frame frame) {
+    public SearchBarField(MainFrame frame) {
         super("Search");
         this.frame = frame;
         setColumns(SEARCH_BAR_WIDTH);

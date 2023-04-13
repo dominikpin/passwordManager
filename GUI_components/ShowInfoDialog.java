@@ -15,8 +15,8 @@ import logic.LoginInfo;
 
 public class ShowInfoDialog extends JDialog {
     public ShowInfoDialog(LoginInfo login, String mainPassword) throws Exception {
-        setTitle("Add new password");
-        setSize(300, 200);
+        setTitle("Info display");
+        setSize(300, 300);
         setLocationRelativeTo(null);
 
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
@@ -29,13 +29,12 @@ public class ShowInfoDialog extends JDialog {
         ImageIcon Icon = new ImageIcon(login.getIconPath());
         JLabel iconLabel = new JLabel(Icon);
 
-        // TODO add buttun at each info to copy info to clipboard
         // TODO hide password info with dots and add button when pressed to show password
 
-        JLabel domain = new JLabel(String.format("Domain: %s", login.getDomain().isEmpty() ? "/" : login.getDomain()));
-        JLabel email = new JLabel(String.format("Email: %s", login.getEmail().isEmpty() ? "/" : login.getEmail()));
-        JLabel username = new JLabel(String.format("Username: %s", login.getUsername().isEmpty() ? "/" : login.getUsername()));
-        JLabel password = new JLabel(String.format("Password: %s", Encryption.decryptPassword(login.getPassword(), mainPassword)));
+        DisplayInfoPanel domain = new DisplayInfoPanel("Domain", login.getDomain().isEmpty() ? "/" : login.getDomain(), false);
+        DisplayInfoPanel email = new DisplayInfoPanel("Email", login.getEmail().isEmpty() ? "/" : login.getEmail(), false);
+        DisplayInfoPanel username = new DisplayInfoPanel("Username", login.getUsername().isEmpty() ? "/" : login.getUsername(), false);
+        DisplayInfoPanel password = new DisplayInfoPanel("Password", Encryption.decryptPassword(login.getPassword(), mainPassword), true);
 
         JButton editButton = new JButton("Edit info");
         editButton.addActionListener((ActionListener) new ActionListener() {

@@ -19,15 +19,15 @@ import javax.swing.JOptionPane;
 
 import logic.Encryption;
 
-public class Login extends JFrame {
+public class LoginFrame extends JFrame {
 
-    public Login() {
+    public LoginFrame() {
         setTitle("Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         setSize(300, 150);
         setLocationRelativeTo(null);
-        ImageIcon icon = new ImageIcon("assets/LockIcon.jpg");
+        ImageIcon icon = new ImageIcon("assets/lock-icon.jpg");
         setIconImage(icon.getImage());
 
         PlaceholderField filePathOrUsername = new PlaceholderField("File path / Username");
@@ -39,13 +39,13 @@ public class Login extends JFrame {
         login.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (Login.this.checkLogin(filePathOrUsername.getText(), password.getText())) {
+                    if (LoginFrame.this.checkLogin(filePathOrUsername.getText(), password.getText())) {
                         String folderName = "Icons";
                         File folder = new File(folderName);
                         if (!folder.exists()) {
                             folder.mkdir();
                         }
-                        Frame myFrame = new Frame(filePathOrUsername.getText() + ".txt", password.getText());
+                        new MainFrame(filePathOrUsername.getText() + ".txt", password.getText());
                         dispose();
                     }
                 } catch (NoSuchAlgorithmException | IOException e1) {
@@ -57,7 +57,7 @@ public class Login extends JFrame {
         JButton register = new JButton("Register");
         register.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Register register = new Register(Login.this);
+                new RegisterDialog(LoginFrame.this);
             }
         });
 

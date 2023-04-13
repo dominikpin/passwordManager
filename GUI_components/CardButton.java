@@ -14,15 +14,16 @@ import javax.swing.JOptionPane;
 
 import logic.LoginInfo;
 
-public class Card extends JButton {
-    public Card(LoginInfo login, Frame frame, String mainPassword) {
+public class CardButton extends JButton {
+
+    public CardButton(LoginInfo login, MainFrame frame, String mainPassword) {
         setBackground(Color.white);
         setLayout(new BorderLayout());
 
         addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    ShowInfoDialog showInfo = new ShowInfoDialog(login, mainPassword);
+                    new ShowInfoDialog(login, mainPassword);
                 } catch (Exception e1) {
                     System.out.println("SOMETHING IS WRONG");
                 }
@@ -33,10 +34,8 @@ public class Card extends JButton {
         if (!imageFile.exists()) {
             LoginInfo.getIconAndSaveIt(login.getDomain());
         }
-        
-        ImageIcon Icon = new ImageIcon(login.getIconPath());
-
-        JLabel iconLabel = new JLabel(Icon);
+        ImageIcon icon = new ImageIcon(login.getIconPath());
+        JLabel iconLabel = new JLabel(icon);
         JLabel textLabel = new JLabel(login.getEmail().isEmpty() ? login.getUsername() : login.getEmail());
 
         add(iconLabel, BorderLayout.WEST);
