@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -41,12 +42,12 @@ public class RegisterDialog extends JDialog{
         JButton register = new JButton("Register");
         register.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (RegisterDialog.this.checkRegistration(filePathOrUsername.getText(), password.getText(), repeatPassword.getText())) {
+                if (RegisterDialog.this.checkRegistration(filePathOrUsername.getText(), password.getPassword(), repeatPassword.getPassword())) {
                     try {
                         File file = new File("./" + filePathOrUsername.getText() + ".txt");
                         file.createNewFile();
                         BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-                        writer.write(Encryption.mainPasswordEncryption(password.getText()));
+                        writer.write(Encryption.mainPasswordEncryption(password.getPassword()));
                         writer.newLine();
                         writer.close();
                         JOptionPane.showMessageDialog(RegisterDialog.this, "Successfully added a new user.\nMake sure to remember your password.\nYour data will be saved in <username>.txt file so have this file in same folder as this program when you want to access your passwords", "New user added", JOptionPane.CLOSED_OPTION);
@@ -65,12 +66,12 @@ public class RegisterDialog extends JDialog{
         setVisible(true);
     }
 
-    public boolean checkRegistration(String filePath, String password1, String password2) {
-        if (filePath.isEmpty() || password1.isEmpty() || password2.isEmpty()) {
+    public boolean checkRegistration(String filePath, char[] password1, char[] password2) {
+        if (filePath.isEmpty() || password1.length == 0 || password2.length == 0) {
             JOptionPane.showMessageDialog(this, "Can't have any inputs empty", "Could not add new password", JOptionPane.CLOSED_OPTION);
             return false;
         }
-        if (!password1.equals(password2)) {
+        if (!Arrays.equals(password1, password2)) {
             JOptionPane.showMessageDialog(this, "First and second passwords don't match", "Could not add new password", JOptionPane.CLOSED_OPTION);
             return false;
         }

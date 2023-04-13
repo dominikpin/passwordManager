@@ -39,13 +39,13 @@ public class LoginFrame extends JFrame {
         login.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (LoginFrame.this.checkLogin(filePathOrUsername.getText(), password.getText())) {
+                    if (LoginFrame.this.checkLogin(filePathOrUsername.getText(), password.getPassword())) {
                         String folderName = "Icons";
                         File folder = new File(folderName);
                         if (!folder.exists()) {
                             folder.mkdir();
                         }
-                        new MainFrame(filePathOrUsername.getText() + ".txt", password.getText());
+                        new MainFrame(filePathOrUsername.getText() + ".txt", password.getPassword());
                         dispose();
                     }
                 } catch (NoSuchAlgorithmException | IOException e1) {
@@ -79,14 +79,13 @@ public class LoginFrame extends JFrame {
         return line.equals(password);
     }
 
-    public boolean checkLogin(String filePath, String password) throws NoSuchAlgorithmException, IOException {
+    public boolean checkLogin(String filePath, char[] password) throws NoSuchAlgorithmException, IOException {
         File file = new File("./" + filePath + ".txt");
         if (!file.exists()) {
             JOptionPane.showMessageDialog(this, "Wrong username/filePath", "Wrong username", JOptionPane.CLOSED_OPTION);
             return false;
         }
         if (!checkPassword(filePath + ".txt", Encryption.mainPasswordEncryption(password))) {
-            System.out.println("wrong password");
             JOptionPane.showMessageDialog(this, "Wrong password", "Wrong password", JOptionPane.CLOSED_OPTION);
             return false;
         }

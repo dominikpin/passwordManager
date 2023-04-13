@@ -14,9 +14,9 @@ import logic.Encryption;
 import logic.LoginInfo;
 
 public class ShowInfoDialog extends JDialog {
-    public ShowInfoDialog(LoginInfo login, String mainPassword) throws Exception {
+    public ShowInfoDialog(LoginInfo login, char[] mainPassword) throws Exception {
         setTitle("Info display");
-        setSize(300, 300);
+        setSize(400, 300);
         setLocationRelativeTo(null);
 
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
@@ -29,13 +29,12 @@ public class ShowInfoDialog extends JDialog {
         ImageIcon Icon = new ImageIcon(login.getIconPath());
         JLabel iconLabel = new JLabel(Icon);
 
-        // TODO hide password info with dots and add button when pressed to show password
+        DisplayInfoPanel domain = new DisplayInfoPanel("Domain", login.getDomain().isEmpty() ? "/" : login.getDomain());
+        DisplayInfoPanel email = new DisplayInfoPanel("Email", login.getEmail().isEmpty() ? "/" : login.getEmail());
+        DisplayInfoPanel username = new DisplayInfoPanel("Username", login.getUsername().isEmpty() ? "/" : login.getUsername());
+        DisplayInfoPanel password = new DisplayInfoPanel("Password", Encryption.decryptPassword(login.getPassword(), mainPassword));
 
-        DisplayInfoPanel domain = new DisplayInfoPanel("Domain", login.getDomain().isEmpty() ? "/" : login.getDomain(), false);
-        DisplayInfoPanel email = new DisplayInfoPanel("Email", login.getEmail().isEmpty() ? "/" : login.getEmail(), false);
-        DisplayInfoPanel username = new DisplayInfoPanel("Username", login.getUsername().isEmpty() ? "/" : login.getUsername(), false);
-        DisplayInfoPanel password = new DisplayInfoPanel("Password", Encryption.decryptPassword(login.getPassword(), mainPassword), true);
-
+        // TODO add functionality to edit button
         JButton editButton = new JButton("Edit info");
         editButton.addActionListener((ActionListener) new ActionListener() {
             public void actionPerformed(ActionEvent e) {

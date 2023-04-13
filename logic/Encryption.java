@@ -24,9 +24,9 @@ public class Encryption {
     private static final String ALGORITHM = "AES";
     private static final String CIPHER_TRANSFORMATION = "AES/CBC/PKCS5Padding";
 
-    public static String mainPasswordEncryption(String password) throws NoSuchAlgorithmException {
+    public static String mainPasswordEncryption(char[] password) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hashedPassword = digest.digest(password.getBytes(StandardCharsets.UTF_8));
+        byte[] hashedPassword = digest.digest(new String(password).getBytes(StandardCharsets.UTF_8));
         String hashedPasswordString = bytesToHex(hashedPassword);
 
         return hashedPasswordString;
@@ -51,21 +51,21 @@ public class Encryption {
         return salt;
     }
 
-    public static byte[] generateKeyFromPassword(String password, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public static byte[] generateKeyFromPassword(char[] password, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, ITERATIONS, KEY_SIZE);
+        KeySpec spec = new PBEKeySpec(password, salt, ITERATIONS, KEY_SIZE);
         SecretKey tmp = factory.generateSecret(spec);
         SecretKey secret = new SecretKeySpec(tmp.getEncoded(), ALGORITHM);
         return secret.getEncoded();
     }
 
-    public static String encryptPassword(String password, String key) throws Exception {
+    public static String encryptPassword(char[] password, char[] key) throws Exception {
         byte[] salt = generateSalt();
         byte[] keyBytes = generateKeyFromPassword(key, salt);
     
         Cipher cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
         cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(keyBytes, ALGORITHM), new IvParameterSpec(new byte[16]));
-        byte[] encryptedPassword = cipher.doFinal(password.getBytes());
+        byte[] encryptedPassword = cipher.doFinal(new String(password).getBytes());
     
         byte[] result = new byte[SALT_SIZE + encryptedPassword.length];
         System.arraycopy(salt, 0, result, 0, SALT_SIZE);
@@ -74,7 +74,7 @@ public class Encryption {
         return Base64.getEncoder().encodeToString(result);
     }
 
-    public static String decryptPassword(String encryptedPassword, String key) throws Exception {
+    public static char[] decryptPassword(String encryptedPassword, char[] key) throws Exception {
         byte[] encryptedBytes = Base64.getDecoder().decode(encryptedPassword);
     
         byte[] salt = Arrays.copyOfRange(encryptedBytes, 0, SALT_SIZE);
@@ -84,6 +84,6 @@ public class Encryption {
         cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(keyBytes, ALGORITHM), new IvParameterSpec(new byte[16]));
         byte[] decryptedPassword = cipher.doFinal(Arrays.copyOfRange(encryptedBytes, SALT_SIZE, encryptedBytes.length));
     
-        return new String(decryptedPassword);
+        return new String(decryptedPassword).toCharArray();
     }    
 }

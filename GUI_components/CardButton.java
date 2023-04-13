@@ -7,16 +7,18 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.border.Border;
 
 import logic.LoginInfo;
 
 public class CardButton extends JButton {
 
-    public CardButton(LoginInfo login, MainFrame frame, String mainPassword) {
+    public CardButton(LoginInfo login, MainFrame frame, char[] mainPassword) {
         setBackground(Color.white);
         setLayout(new BorderLayout());
 
@@ -39,7 +41,8 @@ public class CardButton extends JButton {
         JLabel textLabel = new JLabel(login.getEmail().isEmpty() ? login.getUsername() : login.getEmail());
 
         add(iconLabel, BorderLayout.WEST);
-        // TODO add spacer
+        Border emptyBorder = BorderFactory.createEmptyBorder(0, 0, 0, 5);
+        iconLabel.setBorder(emptyBorder);
         add(textLabel, BorderLayout.CENTER);
 
 

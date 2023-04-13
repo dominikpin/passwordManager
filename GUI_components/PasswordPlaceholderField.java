@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.util.Arrays;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -23,7 +24,7 @@ public class PasswordPlaceholderField extends JPasswordField {
         ImageIcon eyeClosed = new ImageIcon("assets/eye-icon-closed.png");
         JButton showPasswordButton = new JButton(eyeClosed);
         showPasswordButton.addActionListener(e -> {
-            if (getText().isEmpty()) {
+            if (getPassword().length == 0) {
                 return;
             }
             if (getEchoChar() == '\u2022') {
@@ -39,7 +40,7 @@ public class PasswordPlaceholderField extends JPasswordField {
         addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
-                if (getText().isEmpty()) {
+                if (getPassword().length == 0) {
                     setText("");
                     setForeground(Color.BLACK);
                     setEchoChar('\u2022');
@@ -47,7 +48,7 @@ public class PasswordPlaceholderField extends JPasswordField {
             }
             @Override
             public void focusLost(FocusEvent e) {
-                if (getText().isEmpty()) {
+                if (getPassword().length == 0) {
                     setForeground(Color.GRAY);
                     setEchoChar((char)0);
                     setText(placeholder);
@@ -56,13 +57,12 @@ public class PasswordPlaceholderField extends JPasswordField {
         });
     }
 
-    // TODO replace with .getPassword()
     @Override
-    public String getText() {
-        String text = super.getText();
-        if (text.equals(placeholder)) {
-            return "";
+    public char[] getPassword() {
+        char[] text = super.getPassword();
+        if (Arrays.equals(text, placeholder.toCharArray())) {
+            return new char[0];
         }
         return text;
-    }
+    }    
 }
