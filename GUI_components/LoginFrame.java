@@ -39,7 +39,7 @@ public class LoginFrame extends JFrame {
         login.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (LoginFrame.this.checkLogin(filePathOrUsername.getText(), password.getPassword())) {
+                    if (checkLogin(filePathOrUsername.getText(), password.getPassword())) {
                         String folderName = "Icons";
                         File folder = new File(folderName);
                         if (!folder.exists()) {
@@ -79,14 +79,14 @@ public class LoginFrame extends JFrame {
         return line.equals(password);
     }
 
-    public boolean checkLogin(String filePath, char[] password) throws NoSuchAlgorithmException, IOException {
+    public static boolean checkLogin(String filePath, char[] password) throws NoSuchAlgorithmException, IOException {
         File file = new File("./" + filePath + ".txt");
         if (!file.exists()) {
-            JOptionPane.showMessageDialog(this, "Wrong username/filePath", "Wrong username", JOptionPane.CLOSED_OPTION);
+            JOptionPane.showMessageDialog(null, "Wrong username/filePath", "Wrong username", JOptionPane.CLOSED_OPTION);
             return false;
         }
         if (!checkPassword(filePath + ".txt", Encryption.mainPasswordEncryption(password))) {
-            JOptionPane.showMessageDialog(this, "Wrong password", "Wrong password", JOptionPane.CLOSED_OPTION);
+            JOptionPane.showMessageDialog(null, "Wrong password", "Wrong password", JOptionPane.CLOSED_OPTION);
             return false;
         }
         return true;

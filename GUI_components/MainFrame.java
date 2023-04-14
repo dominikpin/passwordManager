@@ -92,7 +92,7 @@ public class MainFrame extends JFrame {
         });
         
         changeMainPassword.addActionListener(e -> {
-            // TODO function for changing main password
+            new ChangeMainPasswordDialog(filePath, MainFrame.this);
         });
         
         logoutMenuItem.addActionListener(e -> {
@@ -249,5 +249,9 @@ public class MainFrame extends JFrame {
 
         cardPanel.revalidate();
         cardPanel.repaint();
+    }
+
+    public void setNewMainPassword(char[] newPassword) {
+        this.mainPassword = newPassword;
     }
 }

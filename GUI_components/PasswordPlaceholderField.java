@@ -11,10 +11,11 @@ import javax.swing.JButton;
 import javax.swing.JPasswordField;
 
 public class PasswordPlaceholderField extends JPasswordField {
+    private static final int BAR_WIDTH = 20;
     private String placeholder;
 
     public PasswordPlaceholderField(String placeholder) {
-        super(placeholder);
+        super(placeholder, BAR_WIDTH);
         this.placeholder = placeholder;
         setEchoChar((char)0);
         setForeground(Color.GRAY);

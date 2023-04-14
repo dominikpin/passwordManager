@@ -6,10 +6,11 @@ import java.awt.event.FocusListener;
 import javax.swing.JTextField;
 
 public class PlaceholderField extends JTextField {
+    private static final int BAR_WIDTH = 20;
     private String placeholder;
 
     public PlaceholderField(String placeholder) {
-        super(placeholder);
+        super(placeholder, BAR_WIDTH);
         this.placeholder = placeholder;
         setForeground(Color.GRAY);
         addFocusListener(new FocusListener() {
