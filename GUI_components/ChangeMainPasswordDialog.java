@@ -26,7 +26,7 @@ public class ChangeMainPasswordDialog extends JDialog {
         ChangeMainPasswordDialog.frame = frame;
         setTitle("Change main password");
         setSize(300, 150);
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(frame);
         setLayout(new FlowLayout());
 
         PasswordPlaceholderField oldPassword = new PasswordPlaceholderField("Old password");
@@ -68,19 +68,35 @@ public class ChangeMainPasswordDialog extends JDialog {
 
     public static boolean checkPasswordChange(String filePath, char[] oldPassword, char[] newPassword, char[] newPasswordRepeated) throws HeadlessException, NoSuchAlgorithmException, IOException {
         if (!LoginFrame.checkPassword(filePath, Encryption.mainPasswordEncryption(oldPassword))) {
-            JOptionPane.showMessageDialog(null, "Old password is incorrect", "Could not change password", JOptionPane.CLOSED_OPTION);
+            JOptionPane.showMessageDialog(
+                frame, 
+                "Old password is incorrect", 
+                "Could not change password", 
+                JOptionPane.CLOSED_OPTION);
             return false;
         }
         if (oldPassword.length == 0 || newPassword.length == 0 || newPasswordRepeated.length == 0) {
-            JOptionPane.showMessageDialog(null, "Can't have any inputs empty", "Could not change password", JOptionPane.CLOSED_OPTION);
+            JOptionPane.showMessageDialog(
+                frame, 
+                "Can't have any inputs empty", 
+                "Could not change password", 
+                JOptionPane.CLOSED_OPTION);
             return false;
         }
         if (!Arrays.equals(newPassword, newPasswordRepeated)) {
-            JOptionPane.showMessageDialog(null, "First and second new passwords don't match", "Could not change password", JOptionPane.CLOSED_OPTION);
+            JOptionPane.showMessageDialog(
+                frame, 
+                "First and second new passwords don't match", 
+                "Could not change password", 
+                JOptionPane.CLOSED_OPTION);
             return false;
         }
         if (Arrays.equals(newPassword, oldPassword)) {
-            JOptionPane.showMessageDialog(null, "Old and new password cannot be the same", "Could not change password", JOptionPane.CLOSED_OPTION);
+            JOptionPane.showMessageDialog(
+                frame, 
+                "Old and new password cannot be the same", 
+                "Could not change password", 
+                JOptionPane.CLOSED_OPTION);
             return false;
         }
         return true;

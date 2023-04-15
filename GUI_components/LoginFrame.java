@@ -45,7 +45,8 @@ public class LoginFrame extends JFrame {
                         if (!folder.exists()) {
                             folder.mkdir();
                         }
-                        new MainFrame(filePathOrUsername.getText() + ".txt", password.getPassword());
+                        MainFrame mainFrame = new MainFrame(filePathOrUsername.getText() + ".txt", password.getPassword());
+                        mainFrame.setLocationRelativeTo(LoginFrame.this);
                         dispose();
                     }
                 } catch (NoSuchAlgorithmException | IOException e1) {
@@ -79,14 +80,22 @@ public class LoginFrame extends JFrame {
         return line.equals(password);
     }
 
-    public static boolean checkLogin(String filePath, char[] password) throws NoSuchAlgorithmException, IOException {
+    public boolean checkLogin(String filePath, char[] password) throws NoSuchAlgorithmException, IOException {
         File file = new File("./" + filePath + ".txt");
         if (!file.exists()) {
-            JOptionPane.showMessageDialog(null, "Wrong username/filePath", "Wrong username", JOptionPane.CLOSED_OPTION);
+            JOptionPane.showMessageDialog(
+                this, 
+                "Wrong username/filePath", 
+                "Wrong username", 
+                JOptionPane.CLOSED_OPTION);
             return false;
         }
         if (!checkPassword(filePath + ".txt", Encryption.mainPasswordEncryption(password))) {
-            JOptionPane.showMessageDialog(null, "Wrong password", "Wrong password", JOptionPane.CLOSED_OPTION);
+            JOptionPane.showMessageDialog(
+                this, 
+                "Wrong password", 
+                "Wrong password", 
+                JOptionPane.CLOSED_OPTION);
             return false;
         }
         return true;

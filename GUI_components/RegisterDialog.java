@@ -23,12 +23,12 @@ import logic.Encryption;
 
 public class RegisterDialog extends JDialog{
     
-    public RegisterDialog(JFrame owner) {
-        super(owner, true);
+    public RegisterDialog(JFrame frame) {
+        super(frame, true);
         setTitle("Register");
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         setSize(300, 150);
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(frame);
         ImageIcon icon = new ImageIcon("assets/lock-icon.jpg");
         setIconImage(icon.getImage());
 
@@ -50,7 +50,11 @@ public class RegisterDialog extends JDialog{
                         writer.write(Encryption.mainPasswordEncryption(password.getPassword()));
                         writer.newLine();
                         writer.close();
-                        JOptionPane.showMessageDialog(RegisterDialog.this, "Successfully added a new user.\nMake sure to remember your password.\nYour data will be saved in <username>.txt file so have this file in same folder as this program when you want to access your passwords", "New user added", JOptionPane.CLOSED_OPTION);
+                        JOptionPane.showMessageDialog(
+                            RegisterDialog.this, 
+                            "Successfully added a new user.\nMake sure to remember your password.\nYour data will be saved in <username>.txt file so have this file in same folder as this program when you want to access your passwords", 
+                            "New user added", 
+                            JOptionPane.CLOSED_OPTION);
                         dispose();
                     } catch (IOException | NoSuchAlgorithmException e1) {
                         System.out.println("SOMETHING IS WRONG");
@@ -68,16 +72,28 @@ public class RegisterDialog extends JDialog{
 
     public boolean checkRegistration(String filePath, char[] password1, char[] password2) {
         if (filePath.isEmpty() || password1.length == 0 || password2.length == 0) {
-            JOptionPane.showMessageDialog(this, "Can't have any inputs empty", "Could not add new password", JOptionPane.CLOSED_OPTION);
+            JOptionPane.showMessageDialog(
+                this, 
+                "Can't have any inputs empty", 
+                "Could not add new password", 
+                JOptionPane.CLOSED_OPTION);
             return false;
         }
         if (!Arrays.equals(password1, password2)) {
-            JOptionPane.showMessageDialog(this, "First and second passwords don't match", "Could not add new password", JOptionPane.CLOSED_OPTION);
+            JOptionPane.showMessageDialog(
+                this, 
+                "First and second passwords don't match", 
+                "Could not add new password", 
+                JOptionPane.CLOSED_OPTION);
             return false;
         }
         File file = new File("./" + filePath + ".txt");
         if (file.exists()) {
-            JOptionPane.showMessageDialog(this, "Username already in use", "Could not add new password", JOptionPane.CLOSED_OPTION);
+            JOptionPane.showMessageDialog(
+                this, 
+                "Username already in use", 
+                "Could not add new password", 
+                JOptionPane.CLOSED_OPTION);
             return false;
         }
         return true;

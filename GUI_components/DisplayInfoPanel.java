@@ -32,7 +32,11 @@ public class DisplayInfoPanel extends JPanel {
                 StringSelection selection = new StringSelection(text);
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(selection, null);
-                JOptionPane.showMessageDialog(null, key + " copied to the clipboard", "Copied to Clipboard", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(
+                    DisplayInfoPanel.this, 
+                    key + " copied to the clipboard", 
+                    "Copied to Clipboard", 
+                    JOptionPane.INFORMATION_MESSAGE);
             }
         });
                
@@ -72,7 +76,11 @@ public class DisplayInfoPanel extends JPanel {
                 StringSelection selection = new StringSelection(new String(text));
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(selection, null);
-                JOptionPane.showMessageDialog(null, key + " copied to the clipboard", "Copied to Clipboard", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(
+                    DisplayInfoPanel.this, key + 
+                    " copied to the clipboard", 
+                    "Copied to Clipboard", 
+                    JOptionPane.INFORMATION_MESSAGE);
             }
         });
         

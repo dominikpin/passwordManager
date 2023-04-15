@@ -63,8 +63,8 @@ public class LoginInfo {
         fileWriter.close();
     }
 
-    public void editLogin(String email, String username, String password, String domain, String iconPath, String filePath) throws IOException {
-
+    public void editLogin(String email, String username, char[] password, String domain, String filePath, char[] mainPassword) throws Exception {
+        
         File file = new File(filePath);
         FileReader fileReader = new FileReader(file);
 
@@ -76,9 +76,9 @@ public class LoginInfo {
             if (line.equals(editLine)) {
                 this.email = email;
                 this.username = username;
-                this.password = password;
+                this.password = Encryption.encryptPassword(password, mainPassword);
                 this.domain = domain;
-                this.iconPath = iconPath;
+                this.iconPath = getIconAndSaveIt(domain);
                 line = this.toString();
             }
             editedContent.append(line);

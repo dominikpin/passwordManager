@@ -18,14 +18,14 @@ import logic.LoginInfo;
 
 public class CardButton extends JButton {
 
-    public CardButton(LoginInfo login, MainFrame frame, char[] mainPassword) {
+    public CardButton(LoginInfo login, MainFrame frame, char[] mainPassword, String filePath) {
         setBackground(Color.white);
         setLayout(new BorderLayout());
 
         addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    new ShowInfoDialog(login, mainPassword);
+                    new ShowInfoDialog(login, mainPassword, filePath, frame);
                 } catch (Exception e1) {
                     System.out.println("SOMETHING IS WRONG");
                 }

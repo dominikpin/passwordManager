@@ -37,6 +37,7 @@ public class MainFrame extends JFrame {
     private char[] mainPassword;
     private static String filePath;
     private String searchBarContent = "";
+    private static JPanel cardPanel;
 
     public MainFrame(String filePath, char[] mainPassword) throws IOException{
         this.mainPassword = mainPassword;
@@ -67,7 +68,6 @@ public class MainFrame extends JFrame {
             }
         });
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-        setLocationRelativeTo(null);
         ImageIcon icon = new ImageIcon("assets/lock-icon.jpg");
         setIconImage(icon.getImage());
         
@@ -88,11 +88,11 @@ public class MainFrame extends JFrame {
         });
         
         newPassMenuItem.addActionListener(e -> {
-            new StrongPasswordGenDialog();
+            new StrongPasswordGenDialog(this);
         });
         
         changeMainPassword.addActionListener(e -> {
-            new ChangeMainPasswordDialog(filePath, MainFrame.this);
+            new ChangeMainPasswordDialog(filePath, this);
         });
         
         logoutMenuItem.addActionListener(e -> {
@@ -164,9 +164,9 @@ public class MainFrame extends JFrame {
         panel.add(addButton, BorderLayout.EAST);
         
 
-        JPanel cardPanel = new JPanel();
+        cardPanel = new JPanel();
         cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.Y_AXIS));
-        addAllCardLogins(cardPanel);
+        addAllCardLogins();
         JScrollPane scrollPane = new JScrollPane(cardPanel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(10);
 
@@ -185,20 +185,13 @@ public class MainFrame extends JFrame {
             loginInfo.removeLogin(filePath);
         }
 
-        JScrollPane scrollPane = (JScrollPane) getContentPane().getComponent(1);
-        JPanel cardPanel = (JPanel) scrollPane.getViewport().getView();
-        cardPanel.removeAll();
-
-        addAllCardLogins(cardPanel);
-
-        cardPanel.revalidate();
-        cardPanel.repaint();
+        resetCardPanel();
     }
 
-    public void addAllCardLogins(JPanel cardPanel) {
+    public void addAllCardLogins() {
         for (LoginInfo login : loginList) {
             if (searchBarContent.equals("") || loginContains(searchBarContent, login)) {
-                CardButton card = new CardButton(login, this, mainPassword);
+                CardButton card = new CardButton(login, this, mainPassword, filePath);
                 JPanel cardWrapperPanel = new JPanel();
                 cardWrapperPanel.setLayout(new BoxLayout(cardWrapperPanel, BoxLayout.Y_AXIS));
                 cardWrapperPanel.add(card);
@@ -240,18 +233,17 @@ public class MainFrame extends JFrame {
 
     public void setSearchBar(String newValue) {
         this.searchBarContent = newValue;
-
-        JScrollPane scrollPane = (JScrollPane) getContentPane().getComponent(1);
-        JPanel cardPanel = (JPanel) scrollPane.getViewport().getView();
-        cardPanel.removeAll();
-
-        addAllCardLogins(cardPanel);
-
-        cardPanel.revalidate();
-        cardPanel.repaint();
+        resetCardPanel();
     }
 
     public void setNewMainPassword(char[] newPassword) {
         this.mainPassword = newPassword;
+    }
+
+    public void resetCardPanel() {
+        cardPanel.removeAll();
+        addAllCardLogins();
+        cardPanel.revalidate();
+        cardPanel.repaint();
     }
 }

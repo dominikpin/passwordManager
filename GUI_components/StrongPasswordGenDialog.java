@@ -11,6 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JSlider;
@@ -21,10 +22,10 @@ import logic.StrongPasswordGen;
 
 public class StrongPasswordGenDialog extends JDialog {
     
-    public StrongPasswordGenDialog() {
+    public StrongPasswordGenDialog(JFrame frame) {
         setTitle("Generate strong password");
         setSize(450, 300);
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(frame);
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         JLabel label = new JLabel("Check every box you want in your password");
         JSlider numberOfChars = new JSlider(0, 4, 40, 16);
@@ -76,7 +77,11 @@ public class StrongPasswordGenDialog extends JDialog {
                 StringSelection selection = new StringSelection(newPassword.getText().substring(21));
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(selection, null);
-                JOptionPane.showMessageDialog(null, "Password copied to the clipboard", "Copied to Clipboard", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(
+                    StrongPasswordGenDialog.this, 
+                    "Password copied to the clipboard", 
+                    "Copied to Clipboard", 
+                    JOptionPane.INFORMATION_MESSAGE);
             }
         });
         JButton refreshPassword = new JButton(new ImageIcon("assets/refresh-icon.png"));

@@ -19,7 +19,7 @@ public class AddLoginDialog extends JDialog {
     public AddLoginDialog(MainFrame frame, char[] mainPassword) {
         setTitle("Add new login");
         setSize(300, 200);
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(frame);
 
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
@@ -40,7 +40,11 @@ public class AddLoginDialog extends JDialog {
                     try {
                         LoginInfo newLoginInfo = new LoginInfo(email.getText(), username.getText(), Encryption.encryptPassword(password.getPassword(), mainPassword), domain.getText(), LoginInfo.getIconAndSaveIt(domain.getText()));
                         frame.addOrRemoveLoginInfo(newLoginInfo, true);
-                        JOptionPane.showMessageDialog(AddLoginDialog.this, "Successfully added a new password.", "New password added", JOptionPane.CLOSED_OPTION);
+                        JOptionPane.showMessageDialog(
+                            AddLoginDialog.this, 
+                            "Successfully added a new password.", 
+                            "New password added", 
+                            JOptionPane.CLOSED_OPTION);
                         dispose();
                     } catch (Exception e1) {
                         System.out.println("SOMETHING IS WRONG");
@@ -67,7 +71,11 @@ public class AddLoginDialog extends JDialog {
 
     public boolean checkNewPassword(String email, String username, char[] passwordChar, String domain) {
         if ((email.isEmpty() && username.isEmpty()) || passwordChar.length == 0) {
-            JOptionPane.showMessageDialog(AddLoginDialog.this, "One of email and username have to be filled in and password has to be filled in.", "Password couldn't be added", JOptionPane.CLOSED_OPTION);
+            JOptionPane.showMessageDialog(
+                AddLoginDialog.this, 
+                "One of email and username have to be filled in and password has to be filled in.", 
+                "Password couldn't be added", 
+                JOptionPane.CLOSED_OPTION);
             return false;
         }
         if (passwordChar.length < 8) {
