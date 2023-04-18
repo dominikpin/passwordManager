@@ -34,9 +34,7 @@ public class PlaceholderField extends JTextField {
     @Override
     public String getText() {
         String text = super.getText();
-        if (text.equals(placeholder)) {
-            return "";
-        }
+        if (text.equals(placeholder)) return "";
         return text;
     }
 }

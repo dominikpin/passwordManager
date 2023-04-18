@@ -1,12 +1,11 @@
 package GUI_components;
 
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -15,13 +14,16 @@ import logic.Encryption;
 import logic.LoginInfo;
 
 public class AddLoginDialog extends JDialog {
+    private static final int WINDOW_WIDTH = 300;
+    private static final int WINDOW_HEIGHT = 200;
+    private static final String ADD_PASSWORD_ICON_PATH = "assets/password-add-icon.png";
     
     public AddLoginDialog(MainFrame frame, char[] mainPassword) {
         setTitle("Add new login");
-        setSize(300, 200);
+        setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         setLocationRelativeTo(frame);
-
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+        setIconImage(new ImageIcon(ADD_PASSWORD_ICON_PATH).getImage());
 
         PlaceholderField email = new PlaceholderField("Email");
         PlaceholderField username = new PlaceholderField("Username");
@@ -31,45 +33,52 @@ public class AddLoginDialog extends JDialog {
         email.addKeyListener(createKeyListener(username));
         username.addKeyListener(createKeyListener(password));
         password.addKeyListener(createKeyListener(domain));
-        domain.addKeyListener(createKeyListener(email));
-
-        JButton submitButton = new JButton("Add");
-        submitButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (checkNewPassword(email.getText(), username.getText(), password.getPassword(), domain.getText())) {
-                    try {
-                        LoginInfo newLoginInfo = new LoginInfo(email.getText(), username.getText(), Encryption.encryptPassword(password.getPassword(), mainPassword), domain.getText(), LoginInfo.getIconAndSaveIt(domain.getText()));
-                        frame.addOrRemoveLoginInfo(newLoginInfo, true);
-                        JOptionPane.showMessageDialog(
-                            AddLoginDialog.this, 
-                            "Successfully added a new password.", 
-                            "New password added", 
-                            JOptionPane.CLOSED_OPTION);
-                        dispose();
-                    } catch (Exception e1) {
-                        System.out.println("SOMETHING IS WRONG");
-                    }
-                } 
-            }
-        });
-        
-        JButton backButton = new JButton("Go Back");
-        backButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                dispose();
+        domain.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) handleAddPassword(email, username, password, domain, mainPassword, frame);
             }
         });
         add(email);
         add(username);
         add(password);
         add(domain);
+
+        JButton submitButton = new JButton("Add");
+        submitButton.addActionListener(e -> handleAddPassword(email, username, password, domain, mainPassword, frame));
+        JButton backButton = new JButton("Go Back");
+        backButton.addActionListener(e -> {
+            frame.requestFocus();
+            dispose();
+        });
         add(submitButton);
         add(backButton);
 
         setVisible(true);
     }
 
-    public boolean checkNewPassword(String email, String username, char[] passwordChar, String domain) {
+    private void handleAddPassword(PlaceholderField email, PlaceholderField username, PasswordPlaceholderField password, PlaceholderField domain, char[] mainPassword, MainFrame frame) {
+        if (checkNewPassword(email.getText(), username.getText(), password.getPassword(), domain.getText())) {
+            try {
+                LoginInfo newLoginInfo = new LoginInfo(
+                    email.getText(), 
+                    username.getText(), 
+                    Encryption.encryptPassword(password.getPassword(), mainPassword), 
+                    domain.getText(), 
+                    LoginInfo.getIconAndSaveIt(domain.getText()));
+                frame.addOrRemoveLoginInfo(newLoginInfo, true);
+                JOptionPane.showMessageDialog(
+                    AddLoginDialog.this, 
+                    "Successfully added a new password.", 
+                    "New password added", 
+                    JOptionPane.CLOSED_OPTION);
+                dispose();
+            } catch (Exception e1) {
+                System.out.println("SOMETHING IS WRONG");
+            }
+        }
+    }
+
+    private boolean checkNewPassword(String email, String username, char[] passwordChar, String domain) {
         if ((email.isEmpty() && username.isEmpty()) || passwordChar.length == 0) {
             JOptionPane.showMessageDialog(
                 AddLoginDialog.this, 

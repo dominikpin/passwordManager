@@ -16,8 +16,6 @@ import logic.LoginInfo;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
@@ -33,6 +31,8 @@ import java.util.List;
 public class MainFrame extends JFrame {
     private static final int WINDOW_WIDTH = 450;
     private static final int WINDOW_HEIGHT = 300;
+    private static final int SCROLLING_SPEED = 10;
+    private static final String LOCK_ICON_PATH = "assets/lock-icon.png";
     private static List<LoginInfo> loginList;
     private char[] mainPassword;
     private static String filePath;
@@ -47,29 +47,11 @@ public class MainFrame extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                int option = JOptionPane.showConfirmDialog(
-                        MainFrame.this, 
-                        "Are you sure you want to exit?", 
-                        "Exit", 
-                        JOptionPane.YES_NO_OPTION);
-                if (option == JOptionPane.YES_OPTION) {
-                    try {
-                        Path folderToDelete = Paths.get("Icons");
-                        Files.walk(folderToDelete)
-                                .map(Path::toFile)
-                                .sorted((o1, o2) -> -o1.compareTo(o2))
-                                .forEach(File::delete);
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                    dispose();
-                    System.exit(0);
-                }
+                exitOrLogoutApplication(false);
             }
         });
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-        ImageIcon icon = new ImageIcon("assets/lock-icon.jpg");
-        setIconImage(icon.getImage());
+        setIconImage(new ImageIcon(LOCK_ICON_PATH).getImage());
         
         JMenuBar menuBar = new JMenuBar();
 
@@ -83,134 +65,74 @@ public class MainFrame extends JFrame {
         JMenuItem logoutMenuItem = new JMenuItem("Logout");
         JMenuItem exitMenuItem = new JMenuItem("Exit");
 
-        newLoginMenuItem.addActionListener(e -> {
-            new AddLoginDialog(MainFrame.this, mainPassword);
-        });
-        
-        newPassMenuItem.addActionListener(e -> {
-            new StrongPasswordGenDialog(this);
-        });
-        
-        changeMainPassword.addActionListener(e -> {
-            new ChangeMainPasswordDialog(filePath, this);
-        });
-        
-        logoutMenuItem.addActionListener(e -> {
-            int option = JOptionPane.showConfirmDialog(
-                MainFrame.this, 
-                "Are you sure you want to logout?", 
-                "Logout", 
-                JOptionPane.YES_NO_OPTION);
-            if (option == JOptionPane.YES_OPTION) {
-                try {
-                    Path folderToDelete = Paths.get("Icons");
-                    Files.walk(folderToDelete)
-                            .map(Path::toFile)
-                            .sorted((o1, o2) -> -o1.compareTo(o2))
-                            .forEach(File::delete);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-                dispose();
-                new LoginFrame();
-            }
-        });
-        
-        exitMenuItem.addActionListener(e -> {
-            int option = JOptionPane.showConfirmDialog(
-                MainFrame.this, 
-                "Are you sure you want to exit?", 
-                "Exit", 
-                JOptionPane.YES_NO_OPTION);
-            if (option == JOptionPane.YES_OPTION) {
-                try {
-                    Path folderToDelete = Paths.get("Icons");
-                    Files.walk(folderToDelete)
-                            .map(Path::toFile)
-                            .sorted((o1, o2) -> -o1.compareTo(o2))
-                            .forEach(File::delete);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-                dispose();
-            }
-        });
-
+        newLoginMenuItem.addActionListener(e -> new AddLoginDialog(MainFrame.this, mainPassword));
+        newPassMenuItem.addActionListener(e -> new StrongPasswordGenDialog(this));
+        changeMainPassword.addActionListener(e -> new ChangeMainPasswordDialog(filePath, this));
+        logoutMenuItem.addActionListener(e -> exitOrLogoutApplication(true));
+        exitMenuItem.addActionListener(e -> exitOrLogoutApplication(false));
         loginMenu.add(newLoginMenuItem);
         loginMenu.add(newPassMenuItem);
         loginMenu.addSeparator();
         loginMenu.add(changeMainPassword);
         loginMenu.add(logoutMenuItem);
         loginMenu.add(exitMenuItem);
-
         menuBar.add(loginMenu);
-
         setJMenuBar(menuBar);
 
         loginList = loadLoginInfo();
 
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout());
-
         SearchBarField searchBar = new SearchBarField(this);
         JButton addButton = new JButton("ADD NEW LOGIN");
-        addButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                new AddLoginDialog(MainFrame.this, mainPassword);
-            }
-        });
-
+        addButton.addActionListener(e -> new AddLoginDialog(MainFrame.this, mainPassword));
         panel.add(searchBar, BorderLayout.WEST);
         panel.add(addButton, BorderLayout.EAST);
-        
+        add(panel, BorderLayout.NORTH);
 
         cardPanel = new JPanel();
         cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.Y_AXIS));
         addAllCardLogins();
         JScrollPane scrollPane = new JScrollPane(cardPanel);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(10);
-
-        add(panel, BorderLayout.NORTH);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(SCROLLING_SPEED);
         add(scrollPane, BorderLayout.CENTER);
 
         setVisible(true);
     }
 
-    public void addOrRemoveLoginInfo(LoginInfo loginInfo, boolean add) throws IOException {
-        if (add) {
-            loginList.add(loginInfo);
-            loginInfo.saveLogin(filePath);
-        } else {
-            loginList.remove(loginInfo);
-            loginInfo.removeLogin(filePath);
-        }
-
-        resetCardPanel();
-    }
-
-    public void addAllCardLogins() {
-        for (LoginInfo login : loginList) {
-            if (searchBarContent.equals("") || loginContains(searchBarContent, login)) {
-                CardButton card = new CardButton(login, this, mainPassword, filePath);
-                JPanel cardWrapperPanel = new JPanel();
-                cardWrapperPanel.setLayout(new BoxLayout(cardWrapperPanel, BoxLayout.Y_AXIS));
-                cardWrapperPanel.add(card);
-                Dimension preferredSize = card.getPreferredSize();
-                cardWrapperPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) preferredSize.getHeight()));
-                cardPanel.add(cardWrapperPanel);
+    private void exitOrLogoutApplication(boolean makeLogin) {
+        String message;
+        if (makeLogin) message = "Are you sure you want to logout?";
+        else message = "Are you sure you want to exit?";
+        int option = JOptionPane.showConfirmDialog(
+                MainFrame.this, 
+                message, 
+                "Exit", 
+                JOptionPane.YES_NO_OPTION);
+        if (option == JOptionPane.YES_OPTION) {
+            try {
+                Path folderToDelete = Paths.get("Icons");
+                Files.walk(folderToDelete)
+                        .map(Path::toFile)
+                        .sorted((o1, o2) -> -o1.compareTo(o2))
+                        .forEach(File::delete);
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
+            dispose();
+            if (makeLogin) new LoginFrame(this);
+            else System.exit(0);
         }
     }
 
-    public static boolean loginContains(String searchBar, LoginInfo login) {
+    private static boolean loginContains(String searchBar, LoginInfo login) {
         searchBar = searchBar.toLowerCase();
-        if (login.getDomain().toLowerCase().contains(searchBar) || login.getEmail().toLowerCase().contains(searchBar) || login.getUsername().toLowerCase().contains(searchBar)) {
+        if (login.getDomain().toLowerCase().contains(searchBar) || login.getEmail().toLowerCase().contains(searchBar) || login.getUsername().toLowerCase().contains(searchBar)) 
             return true;
-        }
         return false;
     }
 
-    public static List<LoginInfo> loadLoginInfo() throws IOException {
+    private static List<LoginInfo> loadLoginInfo() throws IOException {
         List<LoginInfo> loginInfo = new ArrayList<LoginInfo>();
         File file = new File(filePath);
         FileReader fileReader = new FileReader(file);
@@ -231,13 +153,29 @@ public class MainFrame extends JFrame {
         return loginInfo;
     }
 
-    public void setSearchBar(String newValue) {
-        this.searchBarContent = newValue;
-        resetCardPanel();
+    private void addAllCardLogins() {
+        for (LoginInfo login : loginList) {
+            if (searchBarContent.equals("") || loginContains(searchBarContent, login)) {
+                CardButton card = new CardButton(login, this, mainPassword, filePath);
+                JPanel cardWrapperPanel = new JPanel();
+                cardWrapperPanel.setLayout(new BoxLayout(cardWrapperPanel, BoxLayout.Y_AXIS));
+                cardWrapperPanel.add(card);
+                Dimension preferredSize = card.getPreferredSize();
+                cardWrapperPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) preferredSize.getHeight()));
+                cardPanel.add(cardWrapperPanel);
+            }
+        }
     }
 
-    public void setNewMainPassword(char[] newPassword) {
-        this.mainPassword = newPassword;
+    public void addOrRemoveLoginInfo(LoginInfo loginInfo, boolean add) throws IOException {
+        if (add) {
+            loginList.add(loginInfo);
+            loginInfo.saveLogin(filePath);
+        } else {
+            loginList.remove(loginInfo);
+            loginInfo.removeLogin(filePath);
+        }
+        resetCardPanel();
     }
 
     public void resetCardPanel() {
@@ -245,5 +183,14 @@ public class MainFrame extends JFrame {
         addAllCardLogins();
         cardPanel.revalidate();
         cardPanel.repaint();
+    }
+
+    public void setSearchBar(String newValue) {
+        this.searchBarContent = newValue;
+        resetCardPanel();
+    }
+
+    public void setNewMainPassword(char[] newPassword) {
+        this.mainPassword = newPassword;
     }
 }

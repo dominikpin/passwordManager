@@ -1,7 +1,9 @@
 package GUI_components;
 
-import javax.swing.*;
-import java.awt.event.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+
+import javax.swing.SwingUtilities;
 
 public class SearchBarField extends PlaceholderField {
     private static final int SEARCH_BAR_WIDTH = 20;

@@ -3,8 +3,6 @@ package GUI_components;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -15,92 +13,83 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import logic.StrongPasswordGen;
 
 public class StrongPasswordGenDialog extends JDialog {
+    private static final int WINDOW_WIDTH = 450;
+    private static final int WINDOW_HEIGHT = 300;
+    private static final String PASSWORD_PREFIX = "New strong password: ";
+    private static final String COPY_ICON_PATH = "assets/copy-to-clipboard-icon.png";
+    private static final String PASSWORD_GEN_ICON_PATH = "assets/refresh-icon.png";
+    private static final String REFRESH_ICON_PATH = "assets/refresh-icon.png";
+
+    JLabel passwordLabel;
     
     public StrongPasswordGenDialog(JFrame frame) {
         setTitle("Generate strong password");
-        setSize(450, 300);
+        setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         setLocationRelativeTo(frame);
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
-        JLabel label = new JLabel("Check every box you want in your password");
+        setIconImage(new ImageIcon(PASSWORD_GEN_ICON_PATH).getImage());
+
         JSlider numberOfChars = new JSlider(0, 4, 40, 16);
         JLabel numberOfCharsLabel = new JLabel(String.format("%s", numberOfChars.getValue()));
-        
-        JCheckBox letters = new JCheckBox("Letters");
-        letters.setSelected(true);
-        JCheckBox numbers = new JCheckBox("Numbers");
-        numbers.setSelected(true);
-        JCheckBox symbols = new JCheckBox("Symbols");
-        numbers.setSelected(true);
-        JLabel newPassword = new JLabel("Password: ");
-        numberOfChars.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                newPassword.setText("New strong password: " + StrongPasswordGen.genStrongPassword(numberOfChars.getValue(), letters.isSelected(), numbers.isSelected(), symbols.isSelected()));
-                numberOfCharsLabel.setText(String.format("%s", numberOfChars.getValue()));
-            }
-        });
-        letters.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                newPassword.setText("New strong password: " + StrongPasswordGen.genStrongPassword(numberOfChars.getValue(), letters.isSelected(), numbers.isSelected(), symbols.isSelected()));
-                if (!letters.isSelected()) {
-                    numbers.setEnabled(false);
-                } else {
-                    numbers.setEnabled(true);
-                }
-            }
-        });
-        numbers.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                newPassword.setText("New strong password: " + StrongPasswordGen.genStrongPassword(numberOfChars.getValue(), letters.isSelected(), numbers.isSelected(), symbols.isSelected()));
-                if (!numbers.isSelected()) {
-                    letters.setEnabled(false);
-                } else {
-                    letters.setEnabled(true);
-                }
-            }
-        });
-        symbols.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                newPassword.setText("New strong password: " + StrongPasswordGen.genStrongPassword(numberOfChars.getValue(), letters.isSelected(), numbers.isSelected(), symbols.isSelected()));
-            }
-        });
-        newPassword.setText("New strong password: " + StrongPasswordGen.genStrongPassword(numberOfChars.getValue(), letters.isSelected(), numbers.isSelected(), symbols.isSelected()));
-        
-        JButton copyToClipboard = new JButton(new ImageIcon("assets/copy-to-clipboard-icon.png"));
-        copyToClipboard.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                StringSelection selection = new StringSelection(newPassword.getText().substring(21));
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                clipboard.setContents(selection, null);
-                JOptionPane.showMessageDialog(
-                    StrongPasswordGenDialog.this, 
-                    "Password copied to the clipboard", 
-                    "Copied to Clipboard", 
-                    JOptionPane.INFORMATION_MESSAGE);
-            }
-        });
-        JButton refreshPassword = new JButton(new ImageIcon("assets/refresh-icon.png"));
-        refreshPassword.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                newPassword.setText("New strong password: " + StrongPasswordGen.genStrongPassword(numberOfChars.getValue(), letters.isSelected(), numbers.isSelected(), symbols.isSelected()));
-            }
-        });
-
-        add(label);
         add(numberOfChars);
         add(numberOfCharsLabel);
+        
+        JCheckBox letters = new JCheckBox("Letters", true);
+        JCheckBox numbers = new JCheckBox("Numbers", true);
+        JCheckBox symbols = new JCheckBox("Symbols", true);
+        passwordLabel = new JLabel();
+        numberOfChars.addChangeListener(e -> {
+            updatePasswordLabel(numberOfChars, letters, numbers, symbols);
+            numberOfCharsLabel.setText(String.format("%s", numberOfChars.getValue()));
+        });
+        letters.addActionListener(e -> {
+            updatePasswordLabel(numberOfChars, letters, numbers, symbols);
+            numbers.setEnabled(letters.isSelected());
+        });
+        numbers.addActionListener(e -> {
+            updatePasswordLabel(numberOfChars, letters, numbers, symbols);
+            letters.setEnabled(numbers.isSelected());
+        });
+        symbols.addActionListener(e -> updatePasswordLabel(numberOfChars, letters, numbers, symbols));
+        updatePasswordLabel(numberOfChars, letters, numbers, symbols);
         add(letters);
         add(numbers);
         add(symbols);
-        add(newPassword);
+        add(passwordLabel);
+        
+        JButton copyToClipboard = new JButton(new ImageIcon(COPY_ICON_PATH));
+        copyToClipboard.addActionListener(e -> copyToClipboard());
+        JButton refreshPassword = new JButton(new ImageIcon(REFRESH_ICON_PATH));
+        refreshPassword.addActionListener(e -> updatePasswordLabel(numberOfChars, letters, numbers, symbols));
         add(copyToClipboard);
         add(refreshPassword);
 
+        JButton backButton = new JButton("Go Back");
+        backButton.addActionListener(e -> {
+            frame.requestFocus();
+            dispose();
+        });
+        add(backButton);
+
         setVisible(true);
+    }
+
+    private void updatePasswordLabel(JSlider numberOfChars, JCheckBox letters, JCheckBox numbers, JCheckBox symbols) {
+        passwordLabel.setText(PASSWORD_PREFIX + StrongPasswordGen.genStrongPassword(numberOfChars.getValue(), letters.isSelected(), numbers.isSelected(), symbols.isSelected()));
+    }
+
+    private void copyToClipboard() {
+        StringSelection selection = new StringSelection(passwordLabel.getText().substring(PASSWORD_PREFIX.length()));
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(selection, null);
+        JOptionPane.showMessageDialog(
+                StrongPasswordGenDialog.this, 
+                "Password copied to the clipboard", 
+                "Copied to Clipboard", 
+                JOptionPane.INFORMATION_MESSAGE);
     }
 }

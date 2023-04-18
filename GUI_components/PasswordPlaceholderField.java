@@ -12,6 +12,8 @@ import javax.swing.JPasswordField;
 
 public class PasswordPlaceholderField extends JPasswordField {
     private static final int BAR_WIDTH = 20;
+    private static final String EYE_OPENED_ICON_PATH = "assets/eye-icon-opened.png";
+    private static final String EYE_CLOSED_ICON_PATH = "assets/eye-icon-closed.png";
     private String placeholder;
 
     public PasswordPlaceholderField(String placeholder) {
@@ -21,21 +23,8 @@ public class PasswordPlaceholderField extends JPasswordField {
         setForeground(Color.GRAY);
         setLayout(new BorderLayout());
 
-        ImageIcon eyeOpened = new ImageIcon("assets/eye-icon-opened.png");
-        ImageIcon eyeClosed = new ImageIcon("assets/eye-icon-closed.png");
-        JButton showPasswordButton = new JButton(eyeClosed);
-        showPasswordButton.addActionListener(e -> {
-            if (getPassword().length == 0) {
-                return;
-            }
-            if (getEchoChar() == '\u2022') {
-                setEchoChar((char)0);
-                showPasswordButton.setIcon(eyeOpened);
-            } else {
-                setEchoChar('\u2022');
-                showPasswordButton.setIcon(eyeClosed);
-            }
-        });
+        JButton showPasswordButton = new JButton(new ImageIcon(EYE_CLOSED_ICON_PATH));
+        showPasswordButton.addActionListener(e -> showHidePassword(showPasswordButton));
         add(showPasswordButton, BorderLayout.EAST);
 
         addFocusListener(new FocusListener() {
@@ -58,12 +47,21 @@ public class PasswordPlaceholderField extends JPasswordField {
         });
     }
 
+    private void showHidePassword(JButton showPasswordButton) {
+        if (getPassword().length == 0) return;
+        if (getEchoChar() == '\u2022') {
+            setEchoChar((char)0);
+            showPasswordButton.setIcon(new ImageIcon(EYE_OPENED_ICON_PATH));
+        } else {
+            setEchoChar('\u2022');
+            showPasswordButton.setIcon(new ImageIcon(EYE_CLOSED_ICON_PATH));
+        }
+    }
+
     @Override
     public char[] getPassword() {
         char[] text = super.getPassword();
-        if (Arrays.equals(text, placeholder.toCharArray())) {
-            return new char[0];
-        }
+        if (Arrays.equals(text, placeholder.toCharArray())) return new char[0];
         return text;
     }    
 }
